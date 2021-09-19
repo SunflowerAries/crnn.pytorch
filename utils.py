@@ -31,24 +31,37 @@ class strLabelConverter(object):
 
     def encode(self, text):
         """Support batch or single str.
-
         Args:
             text (str or list of str): texts to convert.
-
         Returns:
-            torch.IntTensor [length_0 + length_1 + ... length_{n - 1}]: encoded texts.
-            torch.IntTensor [n]: length of each text.
+            torch.LongTensor [length_0 + length_1 + ... length_{n - 1}]: encoded texts.
+            torch.LongTensor [n]: length of each text.
         """
-        if isinstance(text, str):
-            text = [
-                self.dict[char.lower() if self._ignore_case else char]
-                for char in text
-            ]
-            length = [len(text)]
-        elif isinstance(text, collections.Iterable):
-            length = [len(s) for s in text]
-            text = ''.join(text)
-            text, _ = self.encode(text)
+
+        length = []
+        result = []
+        for item in text:            
+            item = item.decode('utf-8','strict')
+            length.append(len(item))
+            r = []
+            for char in item:
+                index = self.dict[char]
+                # result.append(index)
+                r.append(index)
+            result.append(r)
+        
+        max_len = 0
+        for r in result:
+            if len(r) > max_len:
+                max_len = len(r)
+        
+        result_temp = []
+        for r in result:
+            for i in range(max_len - len(r)):
+                r.append(0)
+            result_temp.append(r)
+
+        text = result_temp
         return (torch.IntTensor(text), torch.IntTensor(length))
 
     def decode(self, t, length, raw=False):
@@ -131,7 +144,8 @@ def oneHot(v, v_length, nc):
 
 
 def loadData(v, data):
-    v.data.resize_(data.size()).copy_(data)
+    with torch.no_grad():
+        v.resize_(data.size()).copy_(data)
 
 
 def prettyPrint(v):
