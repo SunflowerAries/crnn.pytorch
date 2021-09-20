@@ -7,7 +7,7 @@ from PIL import Image
 import models.crnn as crnn
 
 
-model_path = './data/crnn.pth'
+model_path = './expr/netCRNN_1_20.pth'
 alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 model = crnn.CRNN(32, 1, 37, 256)
@@ -18,7 +18,7 @@ model.load_state_dict(torch.load(model_path))
 
 converter = utils.strLabelConverter(alphabet)
 
-for path, dir_list, file_list in os.walk('1631981572449'):
+for path, dir_list, file_list in os.walk('alldata-val'):
     file_list.sort()
     for file_name in file_list:
         transformer = dataset.resizeNormalize((100, 32))
