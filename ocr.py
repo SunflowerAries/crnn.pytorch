@@ -1,11 +1,11 @@
-import torch
+import torch, os
 from torch.autograd import Variable
 from crnn import strLabelConverter, resizeNormalize
 from PIL import Image
 from filelock import FileLock
 import crnn.models.crnn as crnn
 
-model_path = '/home/sunflower/Downloads/crnn.pytorch/data/crnn.pth'
+model_path = os.path.join(os.getcwd(), 'crnn/data/crnn.pth')
 alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 def ocr(file):
