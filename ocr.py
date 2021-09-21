@@ -1,22 +1,21 @@
 import torch
 from torch.autograd import Variable
-import utils, os
-import dataset
+from crnn import strLabelConverter, resizeNormalize
 from PIL import Image
 from filelock import FileLock
-import models.crnn as crnn
+import crnn.models.crnn as crnn
 
 model_path = '/home/sunflower/Downloads/crnn.pytorch/data/crnn.pth'
 alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 def ocr(file):
     with FileLock(file + '.lock'):
-        converter = utils.strLabelConverter(alphabet)
+        converter = strLabelConverter(alphabet)
         model = crnn.CRNN(32, 1, 37, 256)
 
         model.load_state_dict(torch.load(model_path))
 
-        transformer = dataset.resizeNormalize((100, 32))
+        transformer = resizeNormalize((100, 32))
         image = Image.open(file).convert('L')
         image = transformer(image)
         if torch.cuda.is_available():
