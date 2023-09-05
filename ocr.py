@@ -20,6 +20,7 @@ def ocr(file):
         image = transformer(image)
         if torch.cuda.is_available():
             image = image.cuda()
+            model = model.cuda()
         image = image.view(1, *image.size())
         image = Variable(image)
 
